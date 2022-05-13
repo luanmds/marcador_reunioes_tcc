@@ -2,3 +2,5 @@ marshmallow==3.15.0
 Flask==2.1.2
 flask-restplus==0.13.0
 sqlalchemy==1.4.36
+marshmallow-enum==1.5.1
+bcrypt==3.2.2

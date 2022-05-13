@@ -8,4 +8,6 @@ Este é o código-fonte do projeto de Estudo de Caso do meu TCC intitulado
 Desenho do Modelo:
 ![Modelo proposto](./images/modelo_arquitetura.png)
 
+### Tecnologias Utilizadas
+
 ## Como executar o projeto
