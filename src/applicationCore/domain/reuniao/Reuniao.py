@@ -16,10 +16,27 @@ from src.applicationCore.domain.Entity import Entity
 
 @dataclass
 class Reuniao(Entity):
+    """
+    Classe representando a entidade Reuniao
+
+    Attributes:
+        id (int): identificador único da entidade (herdado da classe Entity).
+        titulo (str): título apresentado na reunião.
+        pauta (str): pauta da reunião para entendimento dos participantes.
+        dataInicio (datetime): data e hora de inicio da reunião.
+        dataTermino (datetime): data e hora do fim da reunião.
+        host (Usuario): criador e anfitrião da reunião.
+        sala (SalaEncontro): local Virtual ou Fisico, que irá ocorrer a reunião.
+        status (Status): representa o estado atual da reunião.
+        lembrete (Lembrete): minutagem a ser acionada para lembrar do ínicio da reunião.
+        convidados (List[Convidado]): lista de convidados participantes da reunião.
+        notificadores (List[NotificadorReuniao]): lista de tipos de notificações de mudanças na reunião para cada convidado.
+    """
 
     def __init__(self, reuniaoId: int, titulo: str, pauta: str, dataInicio: datetime,
                  dataTermino: datetime, host: Usuario, sala: SalaEncontro, status: Status = Status.MARCADA,
-                 lembrete: Lembrete = Lembrete.QUINZE_MINUTOS, convidados: List[Convidado] = None):
+                 lembrete: Lembrete = Lembrete.QUINZE_MINUTOS, convidados: List[Convidado] = None,
+                 notificadores: List[NotificadorReuniao] = None):
         super().__init__(reuniaoId)
         self._titulo = titulo
         self._pauta = pauta
@@ -29,8 +46,8 @@ class Reuniao(Entity):
         self._lembrete = lembrete
         self._host = host
         self._sala = sala
-        self._convidados = convidados
-        self._notificadorReuniao: NotificadorReuniao = None
+        self._convidados: List[Convidado] = convidados
+        self._notificadorReuniao: List[NotificadorReuniao] = notificadores
 
     @property
     def titulo(self) -> str:
@@ -80,8 +97,11 @@ class Reuniao(Entity):
     def convidados(self) -> List[Convidado]:
         return self._convidados
 
-    def addConvidado(self, convidado: Convidado):
+    def adicionarConvidado(self, convidado: Convidado) -> None:
         self._convidados.append(convidado)
+
+    def removerConvidado(self, convidado: Convidado) -> None:
+        self._convidados.pop(convidado)
 
     def concluirReuniao(self) -> bool:
         self._status = Status.CONCLUIDA
@@ -89,3 +109,9 @@ class Reuniao(Entity):
 
     def cancelarReuniao(self) -> bool:
         self._status = Status.CANCELADA
+        return True
+
+    def enviarNotificacoes(self) -> bool:
+        for n in self._notificadorReuniao:
+            for c in self._convidados:
+                n.enviarNotificacao(remetente=c)
