@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 from ast import Not
-from typing import List
+from typing import List, Optional
 
 from src.applicationCore.domain.usuario.Usuario import Usuario
 
@@ -12,7 +12,7 @@ class IUsuarioRepository(ABC):
         super().__init__()
 
     @abstractmethod
-    def findById(self, usuarioId: int) -> Usuario:
+    def findById(self, usuarioId: int) -> Optional[Usuario]:
         raise NotImplementedError
 
     @abstractmethod
@@ -20,9 +20,9 @@ class IUsuarioRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def findByUsername(self, username: str) -> Usuario:
+    def findByUsername(self, username: str) -> Optional[Usuario]:
         raise NotImplementedError
 
     @abstractmethod
-    def findByUsernameAndSenha(self, username: str, senha_encriptada: str) -> Usuario:
+    def findByUsernameAndSenha(self, username: str, senha_encriptada: str) -> Optional[Usuario]:
         raise NotImplementedError

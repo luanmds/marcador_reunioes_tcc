@@ -17,3 +17,7 @@ class Convidado():
     @aceitaReuniao.setter
     def aceitaReuniao(self, aceita: bool):
         self._aceitaReuniao = aceita
+
+    @property
+    def usuario(self) -> Usuario:
+        return self._usuario

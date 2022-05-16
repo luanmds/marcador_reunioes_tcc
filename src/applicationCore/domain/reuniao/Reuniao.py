@@ -97,6 +97,18 @@ class Reuniao(Entity):
     def convidados(self) -> List[Convidado]:
         return self._convidados
 
+    @property
+    def host(self) -> Usuario:
+        return self._host
+
+    @property
+    def notificadores(self) -> List[NotificadorReuniao]:
+        return self._notificadorReuniao
+
+    @notificadores.setter
+    def notificadores(self, notificadores: List[NotificadorReuniao]):
+        self._notificadorReuniao = notificadores
+
     def adicionarConvidado(self, convidado: Convidado) -> None:
         self._convidados.append(convidado)
 

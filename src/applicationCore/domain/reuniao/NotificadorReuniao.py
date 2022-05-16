@@ -12,7 +12,7 @@ class NotificadorReuniao(ABC):
         self._mensagem = mensagem
 
     @abstractmethod
-    def enviarNotificacao(remetente: Convidado):
+    def enviarNotificacao(self, remetente: Convidado):
         raise NotImplementedError
 
     @property
