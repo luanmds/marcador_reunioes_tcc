@@ -1,15 +1,17 @@
 
 from abc import ABC, abstractmethod
-from ast import Not
 from typing import List, Optional
+from src.adapters.DatabaseConnectionAdapter import DatabaseConnectionAdapter
 
 from src.applicationCore.domain.usuario.Usuario import Usuario
 
 
 class IUsuarioRepository(ABC):
 
-    def __init__(self) -> None:
-        super().__init__()
+    _dbConnection: DatabaseConnectionAdapter
+
+    def __init__(self, dbConnection: DatabaseConnectionAdapter) -> None:
+        self._dbConnection = dbConnection
 
     @abstractmethod
     def findById(self, usuarioId: int) -> Optional[Usuario]:

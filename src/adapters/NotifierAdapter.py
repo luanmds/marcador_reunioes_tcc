@@ -1,5 +1,3 @@
-
-
 from abc import ABC
 from src.applicationCore.domain.reuniao.NotificadorReuniao import NotificadorReuniao
 

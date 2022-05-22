@@ -10,6 +10,7 @@ from src.applicationCore.domain.reuniao.SalaEncontro import SalaEncontro
 from src.applicationCore.domain.usuario.IUsuarioRepository import IUsuarioRepository
 from src.applicationCore.domain.usuario.Usuario import Usuario
 from src.applicationCore.services.exceptions.ReuniaoException import ConvidadoNotFound, ReuniaoNotFound
+from src.applicationCore.services.exceptions.UsuarioException import UsuarioNotFound
 from src.applicationCore.services.reuniao.ReuniaoDTO import ReuniaoDTO
 from src.applicationCore.services.usuario.UsuarioBasico import UsuarioBasico
 
@@ -18,14 +19,14 @@ class ReuniaoService():
     _reuniaoRepository: IReuniaoRepository
     _usuarioRepository: IUsuarioRepository
     _notificadores: List[NotifierAdapter]
-    _usuarioLogado: Usuario
+    _usuarioLogado: UsuarioBasico
 
     def __init__(self, reuniaoRepo: IReuniaoRepository, usuarioRepo: IUsuarioRepository,
-                 usuarioLogado: Usuario, notificadores: List[NotifierAdapter]) -> None:
+                 notificadores: List[NotifierAdapter], usuarioLogado: UsuarioBasico) -> None:
         self._reuniaoRepository = reuniaoRepo
-        self._usuarioLogado = usuarioLogado
         self._notificadores = notificadores
         self._usuarioRepository = usuarioRepo
+        self._usuarioLogado = usuarioLogado
 
     def buscaReunioesDaSemanaPorUsuarioLogado(self) -> List[Reuniao]:
 
@@ -54,6 +55,9 @@ class ReuniaoService():
 
     def criarReuniao(self, reuniaoDto: ReuniaoDTO) -> int:
 
+        host = self._usuarioRepository.findByUsername(
+            self._usuarioLogado.username)
+
         convidadosEncontrados: List[Convidado] = list()
 
         for username in reuniaoDto.convidadosUsernames:
@@ -70,7 +74,7 @@ class ReuniaoService():
                               pauta=reuniaoDto.pauta,
                               dataInicio=reuniaoDto.dataInicio,
                               dataTermino=reuniaoDto.dataFim,
-                              host=self._usuarioLogado,
+                              host=host,
                               sala=reuniaoDto.local,
                               lembrete=reuniaoDto.lembrete,
                               convidados=reuniaoDto.convidadosEncontrados,
@@ -84,10 +88,16 @@ class ReuniaoService():
 
     def atualizarReuniao(self, reuniaoDto: ReuniaoDTO) -> bool:
 
+        host = self._usuarioRepository.findByUsername(
+            self._usuarioLogado.username)
+
+        if not host:
+            raise UsuarioNotFound(self._usuarioLogado.username)
+
         reuniao = self._reuniaoRepository.findById(
             reuniaoId=reuniaoDto.reuniaoId)
 
-        if not reuniao or reuniao.host.id != self._usuarioLogado.id:
+        if not reuniao or reuniao.host.id != host.id:
             raise ReuniaoNotFound(reuniaoDto.reuniaoId)
 
         convidadosAtuais = reuniao.convidados
@@ -131,9 +141,15 @@ class ReuniaoService():
 
     def cancelarReuniao(self, reuniaoId: int) -> bool:
 
+        host = self._usuarioRepository.findByUsername(
+            self._usuarioLogado.username)
+
+        if not host:
+            raise UsuarioNotFound(self._usuarioLogado.username)
+
         reuniao = self._reuniaoRepository.findById(reuniaoId=reuniaoId)
 
-        if not reuniao or reuniao.host.id != self._usuarioLogado.id:
+        if not reuniao or reuniao.host.id != host.id:
             raise ReuniaoNotFound(reuniaoId)
 
         reuniao.cancelarReuniao()

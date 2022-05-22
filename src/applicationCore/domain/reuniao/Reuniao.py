@@ -1,16 +1,15 @@
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from tkinter import LEFT
 from typing import List
-from applicationCore.domain.reuniao.NotificadorReuniao import NotificadorReuniao
-from applicationCore.domain.reuniao.SalaEncontro import SalaEncontro
+from src.applicationCore.domain.reuniao.NotificadorReuniao import NotificadorReuniao
+from src.applicationCore.domain.reuniao.SalaEncontro import SalaEncontro
 
-from applicationCore.domain.reuniao.Convidado import Convidado
-from applicationCore.domain.reuniao.Status import Status
-from applicationCore.domain.reuniao.Lembrete import Lembrete
+from src.applicationCore.domain.reuniao.Convidado import Convidado
+from src.applicationCore.domain.reuniao.Status import Status
+from src.applicationCore.domain.reuniao.Lembrete import Lembrete
 
-from applicationCore.domain.usuario.Usuario import Usuario
+from src.applicationCore.domain.usuario.Usuario import Usuario
 from src.applicationCore.domain.Entity import Entity
 
 
@@ -26,7 +25,7 @@ class Reuniao(Entity):
         dataInicio (datetime): data e hora de inicio da reunião.
         dataTermino (datetime): data e hora do fim da reunião.
         host (Usuario): criador e anfitrião da reunião.
-        sala (SalaEncontro): local Virtual ou Fisico, que irá ocorrer a reunião.
+        sala (SalaEncontro): local VusuarioIdrtual ou Fisico, que irá ocorrer a reunião.
         status (Status): representa o estado atual da reunião.
         lembrete (Lembrete): minutagem a ser acionada para lembrar do ínicio da reunião.
         convidados (List[Convidado]): lista de convidados participantes da reunião.
@@ -35,8 +34,9 @@ class Reuniao(Entity):
 
     def __init__(self, reuniaoId: int, titulo: str, pauta: str, dataInicio: datetime,
                  dataTermino: datetime, host: Usuario, sala: SalaEncontro, status: Status = Status.MARCADA,
-                 lembrete: Lembrete = Lembrete.QUINZE_MINUTOS, convidados: List[Convidado] = None,
-                 notificadores: List[NotificadorReuniao] = None):
+                 lembrete: Lembrete = Lembrete.QUINZE_MINUTOS,
+                 convidados: List[Convidado] = field(default_factory=list),
+                 notificadores: List[NotificadorReuniao] = field(default_factory=list)):
         super().__init__(reuniaoId)
         self._titulo = titulo
         self._pauta = pauta
@@ -100,6 +100,14 @@ class Reuniao(Entity):
     @property
     def host(self) -> Usuario:
         return self._host
+
+    @property
+    def sala(self) -> SalaEncontro:
+        return self._sala
+
+    @sala.setter
+    def sala(self, nova_sala: SalaEncontro):
+        self._sala = nova_sala
 
     @property
     def notificadores(self) -> List[NotificadorReuniao]:

@@ -1,15 +1,17 @@
 
 from abc import ABC, abstractmethod
-from ast import Not
-from datetime import date, datetime
-from typing import List
+from datetime import datetime
+from typing import List, Optional
+from src.adapters.DatabaseConnectionAdapter import DatabaseConnectionAdapter
 from src.applicationCore.domain.reuniao.Reuniao import Reuniao
 
 
 class IReuniaoRepository(ABC):
 
-    def __init__(self) -> None:
-        super().__init__()
+    _dbConnection: DatabaseConnectionAdapter
+
+    def __init__(self, dbConnection: DatabaseConnectionAdapter) -> None:
+        self._dbConnection = dbConnection
 
     @abstractmethod
     def save(self, reuniao: Reuniao) -> int:
@@ -24,7 +26,7 @@ class IReuniaoRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def findById(self, reuniaoId: int) -> Reuniao:
+    def findById(self, reuniaoId: int) -> Optional[Reuniao]:
         raise NotImplementedError
 
     @abstractmethod

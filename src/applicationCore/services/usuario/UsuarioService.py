@@ -1,10 +1,12 @@
 
 from typing import List
-from src.applicationCore.domain.usuario.Usuario import Usuario
-from src.applicationCore.services.exceptions.UsuarioException import UsuarioErrorCredentials
+
+from src.applicationCore.domain.usuario.IUsuarioRepository import \
+    IUsuarioRepository
+from src.applicationCore.services.exceptions.UsuarioException import \
+    UsuarioErrorCredentials
 from src.applicationCore.services.usuario.UsuarioBasico import UsuarioBasico
 from src.applicationCore.services.usuario.UsuarioFactory import UsuarioFactory
-from src.applicationCore.domain.usuario.IUsuarioRepository import IUsuarioRepository
 from src.utils.password_utils import encrypt_password
 
 
