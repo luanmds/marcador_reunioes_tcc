@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "env": { 
+                "PYTHONPATH": "${workspaceRoot}/app",
+                "DB_USER": "root",
+                "DB_PASS": "admin123",
+                "DB_SCHEMA": "marcadorReuniaoDB",
+                "DB_HOST": "localhost",
+                "SECRET_API_KEY": "$2a$12$nb2wVjJuzCDydUUSE8G1beumWIgDw0d3mHdssMhANDVLyjHm9s88e"
+            },
+            "program": "main.py",
+            "cwd": "${workspaceFolder}/app",
+        }
+    ]
+}

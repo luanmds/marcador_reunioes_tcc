@@ -1,11 +1,16 @@
-FROM python:3.10.4-alpine3.15
+FROM python:3.9.13-alpine3.15 as base
+RUN apk update && apk add g++ libffi-dev
 
-WORKDIR /usr/src/app
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+FROM base as builder
 
-COPY src/ .
+WORKDIR /app
 
-CMD ["./main.py"]
-ENTRYPOINT ["python"]
+COPY app/requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY app .
+
+EXPOSE 5000
+
+CMD ["python3", "main.py"]
