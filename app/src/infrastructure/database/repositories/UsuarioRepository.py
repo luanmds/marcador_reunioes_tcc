@@ -28,7 +28,7 @@ class UsuarioRepository(IUsuarioRepository):
                 return []
 
             return [Usuario(
-                usuario_id=user.usuarioId,
+                usuarioId=user.usuarioId,
                 username=user.username,
                 senha=user.senha,
                 dadosPessoais=DadosPessoais(
@@ -48,7 +48,7 @@ class UsuarioRepository(IUsuarioRepository):
                 return None
 
             usuario = Usuario(
-                usuario_id=user.usuarioId,
+                usuarioId=user.usuarioId,
                 username=user.username,
                 senha=user.senha,
                 dadosPessoais=DadosPessoais(

@@ -5,8 +5,8 @@ from src.applicationCore.domain.reuniao.SalaEncontro import SalaEncontro
 
 class SalaVirtual(SalaEncontro):
 
-    def __init__(self, salaEncontroId: int, nome: str, link: str) -> None:
-        super().__init__(salaEncontroId, nome)
+    def __init__(self, nome: str, link: str) -> None:
+        super().__init__(nome)
         self._link = link
 
     @property

@@ -1,6 +1,6 @@
 from flask_restx import Api
 from src.infrastructure.controllers.UsuarioController import api as ns_usuario
-
+from src.infrastructure.controllers.ReuniaoController import api as ns_reuniao
 
 authorizations = {
     'apikey': {
@@ -21,3 +21,4 @@ api = Api(
 )
 
 api.add_namespace(ns_usuario)
+api.add_namespace(ns_reuniao)

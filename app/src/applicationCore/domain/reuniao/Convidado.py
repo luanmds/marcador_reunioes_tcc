@@ -21,3 +21,6 @@ class Convidado():
     @property
     def usuario(self) -> Usuario:
         return self._usuario
+
+    def __eq__(self, other):
+        return self._usuario.id == other.usuario.id

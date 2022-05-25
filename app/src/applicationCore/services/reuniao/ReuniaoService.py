@@ -1,16 +1,19 @@
 
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 from typing import List, Tuple
+
 from src.adapters.NotifierAdapter import NotifierAdapter
 from src.applicationCore.domain.reuniao.Convidado import Convidado
-from src.applicationCore.domain.reuniao.Lembrete import Lembrete
+from src.applicationCore.domain.reuniao.IReuniaoRepository import \
+    IReuniaoRepository
 from src.applicationCore.domain.reuniao.Reuniao import Reuniao
-from src.applicationCore.domain.reuniao.IReuniaoRepository import IReuniaoRepository
-from src.applicationCore.domain.reuniao.SalaEncontro import SalaEncontro
-from src.applicationCore.domain.usuario.IUsuarioRepository import IUsuarioRepository
-from src.applicationCore.domain.usuario.Usuario import Usuario
-from src.applicationCore.services.exceptions.ReuniaoException import ConvidadoNotFound, ReuniaoNotFound
-from src.applicationCore.services.exceptions.UsuarioException import UsuarioNotFound
+from src.applicationCore.domain.reuniao.Status import Status
+from src.applicationCore.domain.usuario.IUsuarioRepository import \
+    IUsuarioRepository
+from src.applicationCore.services.exceptions.ReuniaoException import (
+    ConvidadoNotFound, ReuniaoCancelada, ReuniaoNotFound)
+from src.applicationCore.services.exceptions.UsuarioException import \
+    UsuarioNotFound
 from src.applicationCore.services.reuniao.ReuniaoDTO import ReuniaoDTO
 from src.applicationCore.services.usuario.UsuarioBasico import UsuarioBasico
 
@@ -22,34 +25,50 @@ class ReuniaoService():
     _usuarioLogado: UsuarioBasico
 
     def __init__(self, reuniaoRepo: IReuniaoRepository, usuarioRepo: IUsuarioRepository,
-                 notificadores: List[NotifierAdapter], usuarioLogado: UsuarioBasico) -> None:
+                 notificadores: List[NotifierAdapter]) -> None:
         self._reuniaoRepository = reuniaoRepo
         self._notificadores = notificadores
         self._usuarioRepository = usuarioRepo
-        self._usuarioLogado = usuarioLogado
 
-    def buscaReunioesDaSemanaPorUsuarioLogado(self) -> List[Reuniao]:
+    def buscaReunioesDaSemanaPorUsuarioLogado(self) -> List[ReuniaoDTO]:
 
         dataInicio, dataTermino = self.__obterSemanaDeTrabalho()
 
+        host = self._usuarioRepository.findByUsername(
+            self._usuarioLogado.username)
         reunioes = self._reuniaoRepository.findAllBetweenDataInicioAndDataTerminoFromUsuario(
-            dataInicio, dataTermino, self._usuarioLogado.id)
+            dataInicio, dataTermino, host.id)
 
         return reunioes
 
-    def buscaReuniaoPorId(self, reuniaoId: int) -> Reuniao:
+    def buscaReuniaoPorId(self, reuniaoId: int) -> ReuniaoDTO:
 
         reuniao = self._reuniaoRepository.findById(reuniaoId)
 
         if not reuniao:
             raise ReuniaoNotFound(reuniaoId)
 
-        return reuniao
+        dto = ReuniaoDTO(
+            reuniaoId=reuniao.id,
+            titulo=reuniao.titulo,
+            pauta=reuniao.pauta,
+            dataInicio=reuniao.dataInicio,
+            dataFim=reuniao.dataTermino,
+            local=reuniao.sala,
+            lembrete=reuniao.lembrete,
+            convidadosUsernames=[
+                c.usuario.username for c in reuniao.convidados],
+            status=reuniao.status)
 
-    def buscaReunioesPorPeriodo(self, dataInicio: date, dataFim: date, usuarioLogado: Usuario) -> List[Reuniao]:
+        return dto
+
+    def buscaReunioesPorPeriodo(self, dataInicio: date, dataFim: date) -> List[ReuniaoDTO]:
+
+        host = self._usuarioRepository.findByUsername(
+            self._usuarioLogado.username)
 
         reunioes = self._reuniaoRepository.findAllBetweenDataInicioAndDataTerminoFromUsuario(
-            dataInicio, dataFim, usuarioLogado.id)
+            dataInicio, dataFim, host.id)
 
         return reunioes
 
@@ -77,11 +96,10 @@ class ReuniaoService():
                               host=host,
                               sala=reuniaoDto.local,
                               lembrete=reuniaoDto.lembrete,
-                              convidados=reuniaoDto.convidadosEncontrados,
+                              convidados=convidadosEncontrados,
                               notificadores=self._notificadores)
 
         novaReuniaoId = self._reuniaoRepository.save(novaReuniao)
-        novaReuniao.id = novaReuniaoId
 
         self.__notificarReuniao(novaReuniao)
         return novaReuniaoId
@@ -94,12 +112,16 @@ class ReuniaoService():
         if not host:
             raise UsuarioNotFound(self._usuarioLogado.username)
 
+        # busca e valida a reunião
         reuniao = self._reuniaoRepository.findById(
             reuniaoId=reuniaoDto.reuniaoId)
 
         if not reuniao or reuniao.host.id != host.id:
             raise ReuniaoNotFound(reuniaoDto.reuniaoId)
+        elif reuniao.status == Status.CANCELADA:
+            raise ReuniaoCancelada(reuniaoDto.reuniaoId)
 
+        # busca e atualiza a lista de Convidados, caso precise
         convidadosAtuais = reuniao.convidados
 
         convidadosUsernamesAtuais = [
@@ -129,6 +151,7 @@ class ReuniaoService():
         reuniao.pauta = reuniaoDto.pauta
         reuniao.status = reuniaoDto.status
         reuniao.lembrete = reuniaoDto.lembrete
+        reuniao.sala = reuniaoDto.local
         reuniao.dataInicio = reuniaoDto.dataInicio
         reuniao.dataTermino = reuniaoDto.dataFim
         reuniao.notificadores = self._notificadores
@@ -151,6 +174,8 @@ class ReuniaoService():
 
         if not reuniao or reuniao.host.id != host.id:
             raise ReuniaoNotFound(reuniaoId)
+        elif reuniao.status == Status.CANCELADA:
+            raise ReuniaoCancelada(reuniaoId)
 
         reuniao.cancelarReuniao()
 
@@ -162,7 +187,7 @@ class ReuniaoService():
 
         for notificador in self._notificadores:
             for convidado in reuniao.convidados:
-                notificador.enviarNotificacao(rementente=convidado)
+                notificador.enviarNotificacao(remetente=convidado)
 
         return True
 
@@ -174,8 +199,7 @@ class ReuniaoService():
             se dia da semana for sábado ou domingo, busca as reuniões da próxima semana
         """
         if diaDaSemana > 4:
-            dataInicio = dataInicio + \
-                timedelta(days=-diaDaSemana, weeks=1)
+            dataInicio = dataInicio + timedelta(days=-diaDaSemana, weeks=1)
 
         elif diaDaSemana != 0:
             dataInicio = dataInicio - timedelta(days=diaDaSemana)

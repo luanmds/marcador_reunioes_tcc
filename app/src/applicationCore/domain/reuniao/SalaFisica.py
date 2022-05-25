@@ -5,8 +5,8 @@ from src.applicationCore.domain.reuniao.SalaEncontro import SalaEncontro
 
 class SalaFisica(SalaEncontro):
 
-    def __init__(self, salaEncontroId: int, nome: str, numero: int) -> None:
-        super().__init__(salaEncontroId, nome)
+    def __init__(self, nome: str, numero: int) -> None:
+        super().__init__(nome)
         self._numero = numero
 
     @property

@@ -1,6 +1,9 @@
 import os
 
 from dependency_injector import containers, providers
+from src.applicationCore.services.reuniao.ReuniaoService import ReuniaoService
+from src.infrastructure.adaptadores.EmailNotifier import EmailNotifier
+from src.infrastructure.adaptadores.SMSNotifier import SMSNotifier
 from src.applicationCore.services.usuario.UsuarioService import UsuarioService
 from src.infrastructure.database.DbSqlConnection import DbSqlConnection
 from src.infrastructure.database.repositories.ReuniaoRepository import \
@@ -27,7 +30,22 @@ class Dependencies(containers.DeclarativeContainer):
     _reuniaoRepository = providers.Singleton(
         ReuniaoRepository, dbConnection=db_conn)
 
+    # adapters
+    emailNotifier = providers.Singleton(
+        EmailNotifier,
+        mensagem="Você está convidado para a reunião")
+
+    smsNotifier = providers.Singleton(
+        SMSNotifier,
+        mensagem="Você está convidado para a reunião")
+
     # services
     usuarioService = providers.Factory(
         UsuarioService,
         usuarioRepo=_usuarioRepository)
+
+    reuniaoService = providers.Factory(
+        ReuniaoService,
+        reuniaoRepo=_reuniaoRepository,
+        usuarioRepo=_usuarioRepository,
+        notificadores=providers.List(emailNotifier, smsNotifier))

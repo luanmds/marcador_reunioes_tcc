@@ -85,6 +85,10 @@ class Reuniao(Entity):
     def status(self) -> Status:
         return self._status
 
+    @status.setter
+    def status(self, novo_status: Status):
+        self._status = novo_status
+
     @property
     def lembrete(self) -> Lembrete:
         return self._lembrete
@@ -121,7 +125,7 @@ class Reuniao(Entity):
         self._convidados.append(convidado)
 
     def removerConvidado(self, convidado: Convidado) -> None:
-        self._convidados.pop(convidado)
+        self._convidados.remove(convidado)
 
     def concluirReuniao(self) -> bool:
         self._status = Status.CONCLUIDA

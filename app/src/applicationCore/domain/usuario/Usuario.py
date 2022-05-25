@@ -16,9 +16,9 @@ class Usuario(Entity):
         dadosPessoais (dadosPessoais): Dados pessoais em detalhes do usuário.
     """
 
-    def __init__(self, usuario_id: int, username: str, senha: str,
+    def __init__(self, usuarioId: int, username: str, senha: str,
                  dadosPessoais: DadosPessoais) -> None:
-        super().__init__(usuario_id)
+        super().__init__(usuarioId)
         self._username = username
         self._senha = senha
         self._dadosPessoais = dadosPessoais

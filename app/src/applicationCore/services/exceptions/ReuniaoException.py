@@ -22,3 +22,12 @@ class ConvidadoNotFound(ReuniaoException):
         self.username = username
         self.message = f"Convidado {username}, não foi encontrado."
         super().__init__(self.message)
+
+
+class ReuniaoCancelada(ReuniaoException):
+
+    def __init__(self, reuniaoId: int) -> None:
+
+        self.reuniaoId = reuniaoId
+        self.message = f"Reunião {reuniaoId} foi cancelada e não pode ser atualizada."
+        super().__init__(self.message)

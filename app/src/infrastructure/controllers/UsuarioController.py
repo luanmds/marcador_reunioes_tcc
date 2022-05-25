@@ -1,5 +1,4 @@
 import dataclasses
-import json
 import os
 from datetime import datetime, timedelta
 
@@ -7,12 +6,12 @@ import jwt
 from dependency_injector.wiring import Provide, inject
 from flask import request
 from flask_restx import Namespace, Resource, fields
-from src.utils.token_required import token_required
+from src.applicationCore.services.usuario.UsuarioBasico import UsuarioBasico
 from src.applicationCore.services.exceptions.UsuarioException import \
     UsuarioErrorCredentials
 from src.applicationCore.services.usuario.UsuarioService import UsuarioService
 from src.infrastructure.Dependencies import Dependencies
-
+from src.utils.token_required import token_required
 
 api = Namespace(
     'usuario', description='Operações envolvendo Usuário na aplicação')
@@ -62,13 +61,13 @@ class UsuarioLogin(Resource):
 
 
 @api.route('/buscar')
-class BuscarUsuarios(Resource):
+class UsuarioFind(Resource):
 
     @api.doc('Busca Usuários através de uma lista de Usernames', security='apikey')
     @api.param('usernames', 'Lista de Usernames separados por espaço em branco', validate=True)
     @token_required
     @inject
-    def get(self, usernames, usuarioService: UsuarioService = Provide[Dependencies.usuarioService]):
+    def get(self, current_user: UsuarioBasico, usuarioService: UsuarioService = Provide[Dependencies.usuarioService]):
 
         data = request.args.to_dict()
 
