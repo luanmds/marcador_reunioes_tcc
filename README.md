@@ -1,9 +1,10 @@
-# TCC 2022.1 - Estudo de Caso: Marcador de Reuniões
+# Trabalho de Conclusão de Curso
+
+## Título: Proposta de Modelo de Arquitetura Hexagonal Para Microservices Python
 
 ## Descrição
 
-Este é o código-fonte do projeto de Estudo de Caso do meu TCC intitulado
-**PROPOSTA DE MODELO DE ARQUITETURA HEXAGONAL PARA MICROSERVICES PYTHON**. Possui o objetivo de demonstrar e testar de forma prática a aplicação do Modelo proposto na monografia. Segue um desenho do modelo.
+Este é o código-fonte do projeto de Estudo de Caso de meu TCC realizado em 2022. Possui o objetivo de demonstrar e testar de forma prática a aplicação do Modelo proposto na monografia. Segue um desenho do modelo.
 
 ![Modelo proposto](./images/modelo_arquitetura.png)
 
