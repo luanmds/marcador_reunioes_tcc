@@ -9,8 +9,7 @@ services:
     env_file: .env
     depends_on:
       - dbmysql
-    volumes:
-      - ./app:/app/
+      - dbmongo
 
   dbmysql:
     build:
@@ -22,11 +21,12 @@ services:
       - "3306:3306"
     volumes:
       - './data_sql_db:/data/db'
-  # database-mongo:
-  #   build:
-  #     context: ./databases/mongodb
-  #   restart: always
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - './data_nosql_db:/data/db'
+
+  dbmongo:
+    build:
+      context: ./databases/mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - './data_nosql_db:/data/db'
