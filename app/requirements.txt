@@ -1,0 +1,9 @@
+Flask==2.1.2
+flask-restx==0.5.1
+sqlalchemy==1.4.36
+mysql-connector-python==8.0.28
+marshmallow==3.15.0
+marshmallow-enum==1.5.1
+bcrypt==3.2.2
+dependency-injector==4.39.1
+PyJWT==2.4.0
